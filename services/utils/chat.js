@@ -1,16 +1,15 @@
-// chat.js
-const fetch = require('node-fetch');
-const { Configuration, OpenAIApi } = require('openai');
-const { queryPinecone } = require('./pinecone');
+import fetch from 'node-fetch';
+import { Configuration, OpenAIApi } from 'openai';
+import { queryPinecone } from './pinecone.js';
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(configuration);
 
-async function chat(userInput) {
+export async function chat(userInput) {
   try {
-    // 1. 使用 OpenAI 建立 embedding 向量
+    // 1. 建立 embedding 向量
     const embeddingRes = await openai.createEmbedding({
       model: 'text-embedding-3-small',
       input: userInput,
@@ -18,7 +17,7 @@ async function chat(userInput) {
 
     const vector = embeddingRes.data.data[0].embedding;
 
-    // 2. 查詢 Pinecone 相關段落
+    // 2. 查詢 Pinecone
     const contexts = await queryPinecone(vector);
     const context = contexts.join('\n\n');
 
@@ -35,7 +34,7 @@ async function chat(userInput) {
       },
     ];
 
-    // 4. 呼叫 GPT 回覆
+    // 4. 呼叫 ChatGPT
     const completion = await openai.createChatCompletion({
       model: 'gpt-3.5-turbo',
       messages,
@@ -47,5 +46,3 @@ async function chat(userInput) {
     return '❌ 發生錯誤，請稍後再試或聯絡客服';
   }
 }
-
-module.exports = { chat };
