@@ -1,5 +1,5 @@
 import express from 'express';
-import { handleEvents, printPrompts } from './index.js';
+import { handleEvents, printPrompts } from './handlers.js'; 
 import config from '../config/index.js';
 import { validateLineSignature } from '../middleware/index.js';
 import storage from '../storage/index.js';
